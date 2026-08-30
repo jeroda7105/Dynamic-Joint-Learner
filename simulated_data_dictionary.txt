@@ -1,0 +1,47 @@
+
+The simulated data are provided in the .RData files under the "data" folder.
+
+The data dictionary for the data contained in these files is: 
+  
+  - revised_revised_missing_simulation_dataset: List object containing all of the 
+    multpliex graph data, nodal attribute data, and information needed for modeling.
+    This object contains:
+    
+      - out: List object containing the arrays related to the multiplex graph data,
+        the nodal attribute data, and indices of the time points containing missing data.
+        This contains:
+        
+        - C_arr: An array of dimension L x J(J-1)/2 x T_total, where L is the number of graph layers,
+          J is the number of graph nodes, and T_total is the total number of time points. This
+          represents the original dynamic multiplex graph, where only the upper-triangular entries of 
+          each graph are stored.
+          
+        - C_probs_adj: An array of dimension L x J(J-1)/2 x T_total. This
+          represents the edge probabilities from the original dynamic multiplex graph.
+        
+        - x_arr: An array of dimension m x J x T_total, where m is the number of nodal attributes.
+          This represents the data for the nodal attributes.
+       
+        - masked_C_arr: An array of dimension L x J(J-1)/2 x T_total.
+          This represents the original dynamic multiplex graph, where the missing edges are masked as NA.
+        
+        - missing_times: This is a vector of length T_mis, of the time points where edges were marked as missing,
+          where T_mis is the number of time points with missing edges.
+        
+    - C_arr_missing: An array of dimension L x J(J-1)/2 x T_obs, where T_obs is the number of observed time points. 
+    This represents the observed portion of the dynamic multiplex graph.
+    
+    - x_arr: An array of dimension m x J x T_obs. This represents the observed nodal attributes.
+    
+    - obs_time_grid: A vector of length T_obs, containing the time values corresponding to observed time points.
+    
+    - missing_time_grid: A vector of length T_mis, of the time points where edges were marked as missing (as numeric).
+    
+    - discarded_time_point_idxs: A vector of length T_mis, of the time points where edges were
+      marked as missing (as integers).
+    
+    
+ 
+
+
+

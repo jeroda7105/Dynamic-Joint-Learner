@@ -1,0 +1,349 @@
+---
+title: 'Dynamic Joint Learner: Analysis on Sensitivity to F'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+header-includes:
+  - \usepackage{subcaption}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# The analysis scripts use paths relative to the code directory.
+# Therefore, the working directory is set to the code directory.
+knitr::opts_knit$set(root.dir = file.path(getwd(), "code"))
+```
+
+
+
+```{r, include=FALSE}
+# Libraries for running in parallel
+library(doParallel)
+library(foreach)
+library(kableExtra)
+library(knitr)
+library(tibble)
+
+
+# Import the functions for generating data, running the model, and obtaining results
+source("model_generation_running_and_testing_functions.R")
+source("F_sensitivity_results_function.R")
+```
+
+
+## Configuration of the Simulation
+
+
+We conduct a sensitivity analysis to assess the effect of the
+number of NN-GP layers, $F$, used to fit the Dynamic Joint Learner.
+The data are generated under three configurations of the true
+latent dimension $R^*$ and number of NN-GP layers $F^*$:
+$(R^*,F^*) \in \{(4,1),(3,2),(2,3)\}$.
+
+For each configuration, we fit the model using
+$F \in \{1,2,3,4\}$ NN-GP layers and summarize performance using AUC, MSPE, $95\%$ PI coverage and length over over three simulation replications.
+
+```{r}
+
+# NN-GP Data Generation Simulation Values used in each of the three cases
+
+# Number of Graph Layers
+L = 2
+
+# Number of nodes in the graphs on each layer
+J = 20
+
+# Number of attributes for each node
+m = 2
+
+# Number of time points (with one being out-of-sample)
+T_len = 21
+
+
+# Hyperparameters for NN-GP Data Generation in Cases 1,2, and 3 
+
+# True dimensions of latent vectors used for data generation, R*
+R_vals = c(4, 3, 2)
+
+# True number of NN-GP layers used for data generation, F*
+sim_F_vals = c(1, 2, 3)
+
+# Concatenate the corresponding true R and F values into a list of vectors
+R_and_sim_F_vals = I(list(c(R_vals[1], sim_F_vals[1]), 
+                          c(R_vals[2], sim_F_vals[2]), 
+                          c(R_vals[3], sim_F_vals[3])))
+
+
+# Values for F, the number of NN-GP layers, used to fit DJL in each case
+# of the sensitivity analysis
+fitted_F_vals = c(1:4)
+
+# Random seeds for the replications of each case
+seed_vals = c(22, 25, 26)
+
+
+# Create a grid using the true R and F for each case, the value of F used to fit DJL,
+# and the values for the seeds in each replication
+param_grid = expand.grid(R_and_sim_F_vals = R_and_sim_F_vals,
+                   fitted_F = fitted_F_vals,
+                   seed = seed_vals)
+
+
+# Number of MCMC iterations used to fit DJL
+niter = 3000
+
+# Number of iterations to discard as burn-in after fitting DJL
+n_burn_in = 2000
+
+
+
+
+# Dimension of the latent vectors used for fitting DJL
+fitted_R = 4
+
+```
+
+## Run the Simulations
+
+The following code runs the different simulations in parallel and saves the results.
+
+```{r run-simulation, results='hide', message=FALSE, warning=FALSE}
+
+# Create a directory named "outputs" to store results if it does not already exist
+if (!dir.exists("outputs")) {
+  dir.create("outputs")
+}
+
+
+# Configure parallel R environment
+
+# Number of cores to use, if left equal to NULL, all available cores will be used
+n_workers = 6
+
+if (is.null(n_workers)) {
+  n_workers = detectCores()
+}
+
+print(paste("Number of cores: ", n_workers, sep = ""))
+
+cl <- makeCluster(n_workers) 
+registerDoParallel(cl) 
+
+
+
+parallel_runs <- foreach (case = 1:nrow(param_grid)) %dopar% {
+  
+  source("model_generation_running_and_testing_functions.R")
+  
+
+  cur_params = param_grid[case, ]
+  
+
+  
+  model_generation_running_and_testing(L = L, J = J, m = m, T_len = T_len,
+                                       R = cur_params$R_and_sim_F_vals[[1]][1],
+                                       time_grid = seq(from = 1, to = T_len, length.out = T_len),
+                                       time_props_missing = rep(0.1, L),
+                                       edge_props_missing = rep(0.25, L), nngp_gen = TRUE,
+                                       tergm_gen = FALSE,
+                                       nngp_L = cur_params$fitted_F,
+                                       sim_nngp_L = cur_params$R_and_sim_F_vals[[1]][2], 
+                                       sigma2_w = 0.4,
+                                       sigma2_b = 0.01,
+                                       niter = niter, fitted_R = fitted_R,
+                                       fitted_R_zeta = fitted_R,
+                                       seed = cur_params$seed,
+                                       n_burn_in = n_burn_in, n_thinning = 1,
+                                       remove_last_point = TRUE)
+
+}
+  
+  
+stopCluster(cl)
+
+
+```
+
+
+## Aggregate the Results
+
+The section of the code aggregates the results from the simulation replications for $F\in\{1,2,3,4\}$ in Case 1, Case 2, and Case 3, respectively.
+
+```{r}
+
+# Aggregated results for Case 1 with R* = 4, F* = 1
+results_case_1 = F_sensitivity_results(fitted_F_vals = fitted_F_vals,
+                                       fitted_R = fitted_R,
+                                       seed_vals = seed_vals,
+                                       L = L, J = J, m = m,
+                                       R = R_vals[1],
+                                       sim_F = sim_F_vals[1],
+                                      T_len = T_len, niter = niter, n_burn_in = n_burn_in) 
+
+# Add F heading
+results_case_1 <- lapply(results_case_1, function(df) {
+  df <- as.data.frame(df)
+  df <- rownames_to_column(df, var = "F")
+  df
+})
+
+
+
+# Aggregated results for Case 2 with R* = 3, F* = 2
+results_case_2 = F_sensitivity_results(fitted_F_vals = fitted_F_vals,
+                                       fitted_R = fitted_R,
+                                       seed_vals = seed_vals,
+                                       L = L, J = J, m = m,
+                                       R = R_vals[2],
+                                       sim_F = sim_F_vals[2],
+                                       T_len = T_len, niter = niter, n_burn_in = n_burn_in) 
+
+# Add F heading
+results_case_2 <- lapply(results_case_2, function(df) {
+  df <- as.data.frame(df)
+  df <- rownames_to_column(df, var = "F")
+  df
+})
+
+# Aggregated results for Case 3 with R* = 2, F* = 3
+results_case_3 = F_sensitivity_results(fitted_F_vals = fitted_F_vals,
+                                       fitted_R = fitted_R,
+                                       seed_vals = seed_vals,
+                                       L = L, J = J, m = m,
+                                       R = R_vals[3],
+                                       sim_F = sim_F_vals[3],
+                                       T_len = T_len, niter = niter, n_burn_in = n_burn_in) 
+
+# Add F heading
+results_case_3 <- lapply(results_case_3, function(df) {
+  df <- as.data.frame(df)
+  df <- rownames_to_column(df, var = "F")
+  df
+})
+
+```
+
+
+## Simulation Results
+
+The following tables summarize the results for sensitivity to $F$ in Case 1, Case 2, and Case 3, respectively.
+
+
+
+\begin{table}[ht]
+\caption{AUC, MSPE, and $95\%$ Prediction Interval Coverages and Lengths for different values of $F$ used to fit DJL in the in-sample, missing, and out-of-sample predictive scenarios in Case 1. Here, we use $L = 2$, $J=20$, $T=20$, $m = 2$, $R^* = 4$, and $F^* = 1$ for data generation. DJL is fitted with $R = 4$. Note. These results correspond to Table 8 in the supplementary materials.}
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_1$auc_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{AUC for Edge Prediction}
+\end{subtable}%
+\hfill
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_1$mspe_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{MSPE for Nodal Attribute Prediction}
+\end{subtable}%
+
+\vspace{2em}
+
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_1$cov_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{95\% Prediction Interval Coverage}
+\end{subtable}%
+\hfill
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_1$len_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{95\% Prediction Interval Length}
+\end{subtable}
+\end{table}
+
+
+
+\begin{table}[ht]
+\caption{AUC, MSPE, and $95\%$ Prediction Interval Coverages and Lengths for different values of $F$ used to fit DJL in the in-sample, missing, and out-of-sample predictive scenarios in Case 2. Here, we use $L = 2$, $J=20$, $T=20$, $m = 2$, $R^* = 3$, and $F^* = 2$ for data generation. DJL is fitted with $R = 4$. Note. These results correspond to Table 9 in the supplementary materials.}
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_2$auc_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{AUC for Edge Prediction}
+\end{subtable}%
+\hfill
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_2$mspe_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{MSPE for Nodal Attribute Prediction}
+\end{subtable}%
+
+\vspace{2em}
+
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_2$cov_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{95\% Prediction Interval Coverage}
+\end{subtable}%
+\hfill
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_2$len_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{95\% Prediction Interval Length}
+\end{subtable}
+\end{table}
+
+
+
+\begin{table}[ht]
+\caption{AUC, MSPE, and $95\%$ Prediction Interval Coverages and Lengths for different values of $F$ used to fit DJL in the in-sample, missing, and out-of-sample predictive scenarios in Case 3. Here, we use $L = 2$, $J=20$, $T=20$, $m = 2$, $R^* = 2$, and $F^* = 3$ for data generation. DJL is fitted with $R = 4$. Note. These results correspond to Table 10 in the supplementary materials.}
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_3$auc_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{AUC for Edge Prediction}
+\end{subtable}%
+\hfill
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_3$mspe_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{MSPE for Nodal Attribute Prediction}
+\end{subtable}%
+
+\vspace{2em}
+
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_3$cov_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{95\% Prediction Interval Coverage}
+\end{subtable}%
+\hfill
+\begin{subtable}{.45\linewidth}
+\centering
+```{r, echo=FALSE}
+kable(results_case_3$len_df, format="latex", booktabs=TRUE, digits=4)
+```
+\caption{95\% Prediction Interval Length}
+\end{subtable}
+\end{table}
+
