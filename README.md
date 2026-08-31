@@ -1,12 +1,13 @@
 
 
-# Sensitivity analysis to **F** (NN-GP layers)
+# Sensitivity Analysis to **F** (NN-GP layers)
 
 This repository reproduces the **sensitivity analysis to the hyperparameter F** (the number of layers used to fit the model’s Neural Network Gaussian Processes) from the manuscript:
 
-**“Integrative Learning of Dynamically Evolving Multiplex Graphs and Nodal Attributes Using Neural Network Gaussian Processes with an Application to Dynamic Terrorism Graphs.”**
+**“Advancing Counter-Terrorism: Predicting Hidden Alliances and Rivalries in Evolving Terrorism Graphs with Organizational Attributes”**
 
-Running the workflow reproduces **Tables 8, 9, and 10** (including subtables) from the **“Sensitivity to F”** portion of the **“Sensitivity Analysis”** section of the manuscript.
+Running the workflow reproduces **Tables 8, 9, and 10** (including subtables) from the **“Sensitivity to F”** portion of the **“Sensitivity Analysis”** section 
+in the supplementary materials of the manuscript.
 
 ---
 
