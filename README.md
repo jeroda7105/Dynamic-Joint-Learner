@@ -1,5 +1,5 @@
 
-```md
+
 # Sensitivity analysis to **F** (NNGP layers) — Reproducible code
 
 This repository reproduces the **sensitivity analysis to the hyperparameter F** (the number of layers used to fit the model’s Neural Network Gaussian Processes) from the manuscript:
