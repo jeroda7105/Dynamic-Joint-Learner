@@ -1,6 +1,6 @@
 
 
-# Sensitivity analysis to **F** (NNGP layers) — Reproducible code
+# Sensitivity analysis to **F** (NN-GP layers)
 
 This repository reproduces the **sensitivity analysis to the hyperparameter F** (the number of layers used to fit the model’s Neural Network Gaussian Processes) from the manuscript:
 
@@ -19,7 +19,7 @@ Running the workflow reproduces **Tables 8, 9, and 10** (including subtables) fr
 
 ## Quick start (recommended)
 
-### 0) Clone the repository
+### 1) Clone the repository
 
 Using HTTPS:
 
@@ -30,10 +30,12 @@ cd Dynamic-Joint-Learner
 
 Or using SSH:
 
+```bash
 git clone git@github.com:jeroda7105/Dynamic-Joint-Learner.git
 cd Dynamic-Joint-Learner
+```
 
-### 1) Make the repository the working directory
+### 2) Make the repository the working directory
 
 The working directory should be the **repository root** (the folder containing `F_sensitivity_analysis.Rmd`, `data/`, and `code/`). For example:
 
@@ -43,14 +45,14 @@ setwd("/path/to/Dynamic-Joint-Learner")
 
 (If you use RStudio, you can also set this via *Session → Set Working Directory…* or by opening `Dynamic-Joint-Learner.Rproj` )
 
-### 2) Restore the reproducible R environment with `renv`
+### 3) Restore the reproducible R environment with `renv`
 
 ```r
 install.packages("renv")   # if needed
 renv::restore()
 ```
 
-### 3) Run the analysis
+### 4) Run the analysis
 
 You can knit in RStudio, or render from the console:
 
@@ -63,8 +65,9 @@ The rendered PDF output is:
 - `F_sensitivity_analysis.pdf`
 
 ---
+## Further Details
 
-## Parallel computing
+### Parallel computing
 
 `F_sensitivity_analysis.Rmd` uses **`doParallel`** and **`foreach`** to run simulation cases and replications in parallel.
 
@@ -75,7 +78,7 @@ If you experience heavy CPU usage or instability, reduce `n_workers`.
 
 ---
 
-## Inputs and outputs
+### Inputs and outputs
 
 ### Inputs (simulated datasets)
 
@@ -87,7 +90,7 @@ Simulated datasets used in the sensitivity analysis are stored as `.RData` files
 
 During execution, the workflow will create a folder (if it does not already exist):
 
-- `outputs/`
+- `code/outputs/`
 
 This folder stores `.RData` files containing **intermediate results** from different model runs.
 
@@ -100,7 +103,7 @@ At the end of the workflow, results are aggregated across replications and cases
 
 ---
 
-## Key files / repository structure
+### Key files / repository structure
 
 ### Main analysis
 
@@ -126,7 +129,7 @@ At the end of the workflow, results are aggregated across replications and cases
 
 ---
 
-## Notes
+### Notes
 
 - If you see “file not found” errors, confirm your working directory is the **repo root**, `Dynamic-Joint-Learner`. 
 - If you see package/version errors, rerun `renv::restore()` and confirm you are using **R 4.5.1**.
