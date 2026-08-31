@@ -6,8 +6,8 @@ This repository reproduces the **sensitivity analysis to the hyperparameter F** 
 
 **“Advancing Counter-Terrorism: Predicting Hidden Alliances and Rivalries in Evolving Terrorism Graphs with Organizational Attributes”**
 
-Running the workflow reproduces **Tables 8, 9, and 10** (including subtables) from the **“Sensitivity to F”** portion of the **“Sensitivity Analysis”** section 
-in the supplementary materials of the manuscript.
+Running the workflow reproduces **Tables 8, 9, and 10** (including subtables) from the supplementary materials of the manuscript,
+Section **2.2.2** (*Sensitivity Analysis → Sensitivity to F*).
 
 ---
 
