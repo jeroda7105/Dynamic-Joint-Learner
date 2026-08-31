@@ -82,9 +82,9 @@ If you experience heavy CPU usage or instability, reduce `n_workers`.
 
 ### Inputs (simulated datasets)
 
-Simulated datasets used in the sensitivity analysis are stored as `.RData` files under:
+- Simulated datasets used in the sensitivity analysis are stored as `.RData` files under `data/`. 
+  The data dictionary for simulated datasets are in the file `data/simulated_data_dictionary.txt`.
 
-- `data/`
 
 ### Outputs (intermediate + final)
 
