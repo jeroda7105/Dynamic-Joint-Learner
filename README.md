@@ -4,7 +4,7 @@
 
 This repository reproduces the **sensitivity analysis to the hyperparameter F** (the number of layers used to fit the model’s Neural Network Gaussian Processes) from the manuscript:
 
-**“Predicting Hidden Alliances and Rivalries in Evolving Networks of Terrorist Organizations”**
+**“Advancing Counter-Terrorism: Predicting Hidden Alliances and Rivalries in Evolving Terrorism Graphs with Organizational Attributes”**
 
 Running the workflow reproduces **Tables 8, 9, and 10** (including subtables) from the supplementary materials of the manuscript,
 Section **2.2.2** (*Sensitivity Analysis → Sensitivity to F*).
