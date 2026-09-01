@@ -54,7 +54,7 @@ setwd("/path/to/Dynamic-Joint-Learner")
 
 ```r
 install.packages("renv")   # if needed
-renv::restore()
+renv::restore(prompt = FALSE)
 ```
 
 ### 4) Run the analysis
