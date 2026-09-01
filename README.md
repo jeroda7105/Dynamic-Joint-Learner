@@ -36,15 +36,19 @@ git clone git@github.com:jeroda7105/Dynamic-Joint-Learner.git
 cd Dynamic-Joint-Learner
 ```
 
-### 2) Make the repository the working directory
 
-The working directory should be the **repository root** (the folder containing `F_sensitivity_analysis.Rmd`, `data/`, and `code/`). For example:
+### 2) Open the RStudio project (recommended) / set the working directory
+
+**Recommended (RStudio):** open `Dynamic-Joint-Learner.Rproj`. This will automatically set the working directory to the **repository root**.
+
+**Alternative (without opening the `.Rproj`):** ensure your working directory is the repository root (the folder containing `F_sensitivity_analysis.Rmd`, `data/`, and `code/`), e.g.
 
 ```r
 setwd("/path/to/Dynamic-Joint-Learner")
 ```
 
-(If you use RStudio, you can also set this via *Session → Set Working Directory…* or by opening `Dynamic-Joint-Learner.Rproj` )
+(You can also set this in RStudio via _Session → Set Working Directory…_.)
+
 
 ### 3) Restore the reproducible R environment with `renv`
 
