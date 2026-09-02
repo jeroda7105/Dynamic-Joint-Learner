@@ -22,17 +22,8 @@ Section **2.2.2** (*Sensitivity Analysis → Sensitivity to F*).
 
 ### 1) Clone the repository
 
-Using HTTPS:
-
 ```bash
 git clone https://github.com/jeroda7105/Dynamic-Joint-Learner.git
-cd Dynamic-Joint-Learner
-```
-
-Or using SSH:
-
-```bash
-git clone git@github.com:jeroda7105/Dynamic-Joint-Learner.git
 cd Dynamic-Joint-Learner
 ```
 
