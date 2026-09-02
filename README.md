@@ -50,7 +50,7 @@ renv::restore(prompt = FALSE)
 
 ### 4) Run the analysis
 
-You can knit in RStudio, or render from the console:
+You can knit in RStudio, or render from the console using:
 
 ```r
 rmarkdown::render("F_sensitivity_analysis.Rmd")
@@ -79,7 +79,7 @@ If you experience heavy CPU usage or instability, reduce `n_workers`.
 ### Inputs (simulated datasets)
 
 - Simulated datasets used in the sensitivity analysis are stored as `.RData` files under `data/`. 
-  The data dictionary for simulated datasets are in the file `data/simulated_data_dictionary.txt`.
+  The data dictionary for simulated datasets is in the file `data/simulated_data_dictionary.txt`.
 
 
 ### Outputs (intermediate + final)
